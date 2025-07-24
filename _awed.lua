@@ -8,9 +8,13 @@
 -- & relayed
 --
 --
--- @ululo
+-- created by
+--     @ululo
 --
---
+-- requires grid 
+-- built for a grid one
+-- midi controller for mapping 
+-- parameters is encouraged
 
 
 engine.name = 'Sawed'
