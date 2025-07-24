@@ -1,2 +1,8 @@
 # _awed
-a harmonic series aggregator
+a harmonic series aggregator 
+
+for norns w/grid
+
+
+
+
