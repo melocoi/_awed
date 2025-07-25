@@ -61,3 +61,6 @@ for quick reference here are some controls mentioned in the video
 Here is a map of the grid layout
 
 <img src="https://ululo.co/image/_awed_grid_map.png" width=300></img>
+
+Now some info on the different parts of the script...
+coming soon....
