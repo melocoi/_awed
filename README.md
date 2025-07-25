@@ -57,3 +57,7 @@ for quick reference here are some controls mentioned in the video
   [ indicated on screen by the thickness of the circles border ]
 
   This filter is quantized to the scale selected for the synth, set in the params menu. This means you will get stepped filter sweeps. Which is an effect I enjoy.
+
+Here is a map of the grid layout
+
+<img src="https://ululo.co/image/_awed_grid_map.png" width=300></img>
