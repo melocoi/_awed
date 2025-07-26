@@ -65,4 +65,41 @@ Here is a map of the grid layout
 <img src="https://ululo.co/image/_awed_grid_map.png" width=300></img>
 
 Now some info on the different parts of the script...
-coming soon....
+
+The script comprises 2 major sections. the Synth, , and the Tape loop.
+
+.................................................................................
+
+.................................................................................
+
+.................................................................................
+
+* the Synth
+
+The synth engine is based on a band pass filtered saw wave. 
+
+There are two modes available. Percussion mode and Long Tone mode. Selected by the PERC/LONG TOGGLE (displayed above).
+
+Control of the synth is available by using the grid sections ENVELOPE GRID, HARMONICS, and ROOT NOTE (displayed above). As well as a filter resonance control using Enc 2.
+
+The premises of this synth and the way to make sounds and pitches is intimately related to the <a href="https://en.wikipedia.org/wiki/Harmonic_series_(music)">harmonic series</a>. An understanding of which, while not required, can open up some of the possibilities and limitations that are present in this interface. The most basic thing to understand is how a harmonic is a multiple of a root pitch. 
+
+So, the 12th harmonic of a pitch of C2 (65.41Hz) is 784.92Hz (65.41 * 12). You may, or may not, realize that this pitch is not a 'real' note in the equal tempered scale, you can't find this on a piano. But it is a real pitch, and these are the kinds of tones that we get to explore with this interface. 
+
+With this in mind, when playing this synth, we select our pitch, or pitches, through a combination of the ROOT NOTE section, and the HARMONICS section. It is possible to have more than one harmonic selected. But only one root note can be selected. Every time we launch a synth, by pressing one of the ENVELOPE GRID keys, it will randomly pick a harmonic that is activated and multiply it by the root note that is selected. 
+
+synth(FREQ) = (ROOT NOTE) * (random(HARMONIC))
+
+
+<img src="https://ululo.co/image/_awed_root.png" width=300></img>
+
+<img src="https://ululo.co/image/_awed_harmonics.png" width=300></img>
+
+
+
+
+
+
+
+
+
