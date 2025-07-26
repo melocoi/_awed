@@ -3,6 +3,8 @@ a harmonic series aggregator
 
 for norns w/grid
 
+<img src="https://raw.githubusercontent.com/melocoi/_awed/refs/heads/main/_awed.png"></img>
+
 
 <a href="https://youtu.be/SwtadkessjA?si=uh_lT5BKscTG2Giv"> video performance/tutorial </a>
 
