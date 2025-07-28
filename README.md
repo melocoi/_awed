@@ -66,7 +66,7 @@ Here is a map of the grid layout
 
 Now some info on the different parts of the script...
 
-The script comprises 2 major sections. the Synth, , and the Tape loop.
+The script comprises 2 major sections. the Synth and the Tape loop.
 
 .................................................................................
 
@@ -74,7 +74,7 @@ The script comprises 2 major sections. the Synth, , and the Tape loop.
 
 .................................................................................
 
-* the Synth
+# the Synth
 
 The synth engine is based on a band pass filtered saw wave. 
 
