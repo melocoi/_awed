@@ -663,8 +663,8 @@ function playSawed(x,y)
   
   if bLong then
     freq = n
-    rqmin = 5 * rq
-    rqmax = 30 * rq
+    rqmin = 1 * rq --was 5
+    rqmax = 5 * rq -- was 30 !!!! this is what would crash things
     detuned = 0.2
     amp = ((1 - (nRand/32))/2 + 0.1)*0.5
   else
