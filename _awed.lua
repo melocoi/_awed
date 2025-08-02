@@ -6,16 +6,6 @@
 -- dismantled
 -- repurposed
 -- & relayed
---
---
--- created by
---     @ululo
---
--- requires grid 
--- built for a grid one
--- midi controller for mapping 
--- parameters is encouraged
-
 
 engine.name = 'Sawed'
 
@@ -23,7 +13,7 @@ engine.name = 'Sawed'
 s = require 'sequins'
 MusicUtil = require("musicutil")
 sft = include('lib/SoftSeas')
-_16n = include("lib/untitled")
+
 
 
 
@@ -66,11 +56,12 @@ lEnd = 22  -- loop End/Length
 newLow = 1245
 dAmp = 1 -- discombobulator volume
 dbTime = 2
-
+tapeWobble = 1
 -- for Engine
 rq = 0.01
 amp = 1.5
 ampFac = 0.3
+dTune = 1
 
 --for screen
 scX = 0
@@ -202,7 +193,7 @@ end
 -- initialize values
 function init()
  
-  _16n.init(_16n_slider_callback)
+ 
  -- setup grid lighting
  
   for i = 1,72 do
@@ -216,7 +207,7 @@ function init()
   g:led(12,8,1)
   loadLED(12,1,1)
   loadMutator1(11,1)--init Mutator 1
-  loadMutator1(11,4)--with shell voicing
+  loadMutator1(11,3)--with shell voicing
   loadMutator1(11,6)--maj7 chord
   loadMutator2(10,1)--init Mutator 2
   loadMutator2(10,3)--with shell voicing
@@ -290,6 +281,17 @@ function init()
     default = 12,
     formatter = function(param) return (param:get().." sec") end,
     action = function() setSlew() end
+  }
+  
+  params:add{
+    type = "number",
+    id = "tapeWobble",
+    name = "Tape Wobble",
+    min = 0,
+    max = 200,
+    default = 100,
+    formatter = function(param) return (param:get().." %") end,
+    action = function() tapeWobble = params:get("tapeWobble")/100 end
   }
 
 -- adding mutator control params
@@ -388,6 +390,19 @@ params:add_separator("sc_in_levels", "softcut levels")
   params:set("SC Amp",1)
   params:set_action("SC Amp", function() for i = 1, 2 do softcut.level(i,params:get("SC Amp")) end end)
   
+params:add_separator("synth_params", "synth engine variables")
+  
+  params:add{
+    type = "number",
+    id = "dTune",
+    name = "detuning amount",
+    min = 1,
+    max = 400,
+    default = 100,
+    formatter = function(param) return (param:get().." %") end,
+    action = function() dTune = params:get("dTune")/100 end
+  }
+  
   build_scale() -- builds initial scale
   m1:start()
   m2:start()
@@ -395,34 +410,6 @@ params:add_separator("sc_in_levels", "softcut levels")
   loadKBawed()
 end
 
---level_eng_cut
-
-function _16n_slider_callback(midi_msg)
-  local slider_id = _16n.cc_2_slider_id(midi_msg.cc)
-  local v = midi_msg.val
-  
-  --[[if slider_id == 16 then
-    mutLvl2 = v/122
-    softcut.level(4,mutLvl2)
-  end
-  
-  if slider_id == 15 then
-    mutLvl1 = v/122
-    softcut.level(3,mutLvl1)
-  end
-  
---[[  if slider_id == 1 then
-    local inLvl = v/122
-    audio.level_adc(inLvl)
-  end
-  
-   if slider_id == 1 then
-    local sftLvl = v/122
-    audio.level_cut(sftLvl)
-  end]]--
-  
-  print("slider #"..slider_id.." just got its value changed to "..v)
-end
 
 function setRstChnc()
   rstChnc =  (100 - params:get("rstChnc1") )/100
@@ -663,15 +650,15 @@ function playSawed(x,y)
   
   if bLong then
     freq = n
-    rqmin = 1 * rq --was 5
-    rqmax = 5 * rq -- was 30 !!!! this is what would crash things
-    detuned = 0.2
+    rqmin = 1 * rq
+    rqmax = 5 * rq -- was 30
+    detuned = 0.2 * dTune
     amp = ((1 - (nRand/32))/2 + 0.1)*0.5
   else
     freq = mults[y]*(x*x)
     rqmin = 0.7 * rq
     rqmax = 0.9 * rq
-    detuned = 1
+    detuned = 1 * dTune
     amp = util.clamp((ampFac/rq)/10,0.4,2)
   end
   
@@ -923,6 +910,7 @@ end
 -- calculate tape head wobble rate
 function calcRteWobble()
   rteWobble = (math.random(980,1000)/1000) * newRate + rteOff
+  rteWobble = rteWobble * tapeWobble
   --print(rteWobble)
   return rteWobble
 end
@@ -990,7 +978,7 @@ function enc(n,d)
   elseif n==2 then
     rq = util.clamp(rq+d/100,0.01,1)
     redraw()
-    
+    print(rq)
   elseif n==3 and z1 then
     sft.sft_enc_pre(d)
    
@@ -1025,10 +1013,22 @@ function key(n,z)
     else
       softcut.query_position(1)
     end
+    
   elseif n==3 and z==1 then
     
-    softcut.query_position(2)
     
+  
+   sT = util.time()
+  elseif n==3 and z==0 then
+    eT = util.time()
+    teT = eT-sT
+    if teT > 1 then
+      softcut.buffer_clear()
+      print("cleared buffers")
+    else
+      softcut.query_position(2)
+    end
+  
   elseif n==1 and z==0 then
    
     z1 = false
@@ -1046,7 +1046,7 @@ function key(n,z)
   screen.fill()
   redraw()
   
-  print(n)
+  
 end
 
 
