@@ -6,15 +6,33 @@
 -- dismantled
 -- repurposed
 -- & relayed
+--
+--                         ululo
+--        harmonic aggregator
+--                         v1.03
+
+--///////////////////////////////////////////////////////////////////////////////////////////////////////////
+--///////////////////////////////////////////////////////////////////////////////////////////////////////////
+--///////////////////////////////////////////////////////////////////////////////////////////////////////////
+-- to change your flavor of Just Intonation
+-- Comment and Uncomment the lines to select which JI intervals you want.
+-- Or make your own!!!
+-------------------------------------------------------------------------------------------------------------
+justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8 } -- "normal"
+--justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8 } --"Ptolemy"
+--justI = { 1/1, 17/16, 9/8, 19/16, 5/4, 21/16, 11/8, 3/2, 13/8, 27/16, 7/4, 15/8 } --"overtone"
+--justI = { 1/1, 16/15, 8/7, 32/27, 16/13, 4/3, 16/11, 32/21, 8/5, 32/19, 16/9, 32/17 } -- "undertone"
+--///////////////////////////////////////////////////////////////////////////////////////////////////////////
+--///////////////////////////////////////////////////////////////////////////////////////////////////////////
+--///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 engine.name = 'Sawed'
 
 -- extras
 s = require 'sequins'
 MusicUtil = require("musicutil")
+
 sft = include('lib/SoftSeas')
-
-
 
 
 
@@ -28,9 +46,17 @@ end
 mults = {1, 1/2, 1/3, 1/4, 1/5, 1/6, 1/7, 1/8} -- uTone series for short saws/percussive rhythm
 
 
-root = {82.407, 92.499, 97.999, 110, 123.47, 130.81, 146.83, 164.81} -- E minor scale Frequencies, overwritten by scale param
+root = {} -- E minor scale Frequencies, overwritten by scale param
 r = root[1] -- select root of scale to start
+ry = 1
+rootFreq = 60
 notes = {} -- table for notes in scale, used for quantization funcions
+notes_ratios = {}
+notes_nums = {}
+notes_freqs = {}
+interval = 1
+thisNote = 1
+temperament = {"JI","TET"}
 
 -- various tables
 filtMax = 5000 -- initial value, overwritten below
@@ -45,7 +71,7 @@ g = grid.connect()
 vol = 1
 rec = 1.0
 pre = 0.8
-rte = 1.0
+rte = 1
 rteOff = 0
 rteQuant = 1.0
 newRate = 1.0
@@ -93,10 +119,11 @@ m1.event = function()
   
   if mutate then
     m1.time = math.random()+math.random(1,(lEnd-lStrt))
-    mPos = math.random(lStrt,lEnd)
+    mPos = math.random()
     local newNote = table.randFrom(tM1)
      if newNote ~= nil then
-        MnewRate = MusicUtil.interval_to_ratio(notes_nums[newNote]-40)/4*(math.random(2))
+        --MnewRate = MusicUtil.interval_to_ratio(notes_nums[newNote]-notes_nums[1])/4*(math.random(2))
+        MnewRate = justI[notes_nums[newNote]]/4*math.random(2)
       else
         MnewRate = 0
       end
@@ -149,11 +176,12 @@ m2.event = function()
   
   if mutate2 then
     m2.time = math.random()+math.random(1,(lEnd-lStrt))
-    mPos2 = math.random(lStrt,lEnd)
+    mPos2 = math.random()
     local newNote = table.randFrom(tM2)
    -- print(newNote)
       if newNote ~= nil then
-        MnewRate2 = MusicUtil.interval_to_ratio(notes_nums[newNote]-40)/2*(math.random(2)*2)
+        -- it was -40
+        MnewRate2 = justI[notes_nums[newNote]]/2*(math.random(2)*2) 
       else
         MnewRate2 = 0
       end
@@ -224,20 +252,80 @@ function init()
   sft.init()
 
   -- params setup
-  -- scale params
-  params:add_separator("scale_settings", "scale settings")
+  params:add_separator("synth_params", "synth engine variables")
+  
+  params:add{
+    type = "number",
+    id = "dTune",
+    name = "detuning amount",
+    min = 1,
+    max = 400,
+    default = 100,
+    formatter = function(param) return (param:get().." %") end,
+    action = function() dTune = params:get("dTune")/100 end
+  }
+  -- scale and tuning params
+  params:add_group("Tuning",17)
+  
+  params:add_text("text1", "first...", "")
+  params:add_text("text2", "choose a root FREQ", "")
+  params:add_text("text3", "or use a note number", "")
+   params:add_text("blank1", "", "")
    -- setting root notes using params
-  params:add{type = "number", id = "root_note", name = "root note",
-    min =36, max = 48, default = 40, formatter = function(param) return MusicUtil.note_num_to_name(param:get(), true) end,
-    action = function() build_scale() end} -- by employing build_scale() here, we update the scale
-
+  params:add{
+    type = "number",
+    id = "rootFreq",
+    name = "Root Frequency",
+    min = 1,
+    max = 160,
+    default = 60,
+    formatter = function(param) return (param:get().." Hz") end,
+    action = function() build_Root(params:get("rootFreq")) end
+  } 
+  
+   
+  params:add{type = "number", id = "root_note", name = "Root Note",
+    min =30, max = 48, default = 36, formatter = function(param) return MusicUtil.note_num_to_name(param:get(), true) end,
+    action = function() build_Root(MusicUtil.note_num_to_freq(params:get("root_note"))) end} -- by employing build_scale() here, we update the scale
+   params:add_text("text4", "param is set when adjusted", "")
+  params:add_text("blank2", "", "")
+  params:add_text("text5", "now choose", "")
+  params:add_text("text6", "your temperament & scale", "")
+  params:add_text("blank3", "", "")
+ -- setting temperment type using params
+  params:add{type = "option", id = "temperament", name = "temperament",
+    options = temperament, default = 1,
+    action = function() 
+      
+              if params:get("temperament") == "JI" then
+                JI = true
+                print("Just Intonation")
+              else
+                JI = false
+                print("Unjust Intonation")
+              end
+      
+             end
+    
+  } -- by employing build_scale() here, we update the scale
+  
   -- setting scale type using params
   params:add{type = "option", id = "scale", name = "scale",
     options = scale_names, default = 1,
     action = function() build_scale() end} -- by employing build_scale() here, we update the scale
+   params:add_text("blank4", "", "")
+    params:add_text("text7", "you can define your", "")
+    params:add_text("text8", "own Just Intonation", "")
+    params:add_text("text9", "in Maiden", "")
+
   
-  -- adding loop length param
-  params:add_separator("loop_settings", "loop settings")
+ -- params:add_separator("loop_settings", "loop settings")
+  
+  params:add_group("Loop Settings",7)
+  scVoice = controlspec.AMP
+  params:add_control("SC Amp","Main Loop Amp",scVoice)
+  params:set("SC Amp",1)
+  params:set_action("SC Amp", function() for i = 1, 2 do softcut.level(i,params:get("SC Amp")) end end)
   
   params:add{
     type = "number",
@@ -293,11 +381,18 @@ function init()
     formatter = function(param) return (param:get().." %") end,
     action = function() tapeWobble = params:get("tapeWobble")/100 end
   }
+  
+  scEngIn = controlspec.AMP
+  params:add_control("Eng Amp","Synth Input Amp",scEngIn)
+  params:set("Eng Amp",1)
+  params:set_action("Eng Amp", function() audio.level_eng_cut(params:get("Eng Amp")) end)
+  
+  
 
 -- adding mutator control params
 
-  params:add_separator("mutator_settings", "mutator settings")
   
+  params:add_group("Mutator Settings",6)
   params:add{
     type = "number",
     id = "mutLvl1",
@@ -366,7 +461,8 @@ function init()
 
 -- adding discombobulator control params
 
-  params:add_separator("discomb_settings", "discombobulator settings")
+
+  params:add_group("Discombobulator",2)
   
   PdAmp = controlspec.AMP
   params:add_control("amplitude","amplitude",PdAmp)
@@ -378,32 +474,12 @@ function init()
   
 -- adding inputs to softcut volume controls
 
-params:add_separator("sc_in_levels", "softcut levels")
+
   
-  scEngIn = controlspec.AMP
-  params:add_control("Eng Amp","Eng Amp",scEngIn)
-  params:set("Eng Amp",1)
-  params:set_action("Eng Amp", function() audio.level_eng_cut(params:get("Eng Amp")) end)
+
   
-  scVoice = controlspec.AMP
-  params:add_control("SC Amp","SC Amp",scVoice)
-  params:set("SC Amp",1)
-  params:set_action("SC Amp", function() for i = 1, 2 do softcut.level(i,params:get("SC Amp")) end end)
-  
-params:add_separator("synth_params", "synth engine variables")
-  
-  params:add{
-    type = "number",
-    id = "dTune",
-    name = "detuning amount",
-    min = 1,
-    max = 400,
-    default = 100,
-    formatter = function(param) return (param:get().." %") end,
-    action = function() dTune = params:get("dTune")/100 end
-  }
-  
-  build_scale() -- builds initial scale
+  --build_scale() -- builds initial scale
+  build_Root(params:get("rootFreq"))
   m1:start()
   m2:start()
   r = root[1]
@@ -438,13 +514,39 @@ function setSlew()
   softcut.rate_slew_time(2,params:get("rateSlew"))  
 end
 
+function build_Root(R)
+  
+ 
+    rootFreq = R
+    print("JUST!!!")
+  
+  build_scale()
+end
 
 function build_scale()
-  notes_nums = MusicUtil.generate_scale_of_length(params:get("root_note"), params:get("scale"), 8) -- builds scale
-  notes_freq = MusicUtil.note_nums_to_freqs(notes_nums) -- converts note numbers to an array of frequencies
-  root = notes_freq
   
-  notes = MusicUtil.generate_scale_of_length(params:get("root_note"), params:get("scale"), 28)
+  
+  
+  notes_nums = MusicUtil.generate_scale_of_length(1, params:get("scale"), 8) -- builds scale
+  
+  notes_freq = {}
+  
+  -- creates a list of frequencies based on rootFreq
+  for i = 1, #notes_nums-1 do
+    --check if JI or ET 
+    if JI then
+      interval = justI[notes_nums[i]]
+    else
+      interval = 2 ^ ((notes_nums[i]-1) / 12)
+    end
+    notes_freq[i] = rootFreq * interval
+  end
+  
+  root = notes_freq
+  r = root[ry]
+  
+  notes = MusicUtil.generate_scale_of_length(MusicUtil.freq_to_note_num(r), params:get("scale"), 28)
+  
   filtMax = MusicUtil.note_num_to_freq(notes[#notes])
   low=filtMax
 end
@@ -519,7 +621,7 @@ function keyboardAwed(x,y,z)
     
     if x < 9 then
       playSawed(x,y)
-      print('played')
+      --print('played')
     end
     
     if x == 9 then
@@ -707,6 +809,7 @@ function loadLED(x,y,z)
     for iy = 1,7 do
       g:led(x,iy,3)
     end
+    ry = y
     r = root[y]
     g:led(x,y,15)
  --[[ if z == 1 then

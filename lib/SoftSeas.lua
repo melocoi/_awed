@@ -143,7 +143,7 @@ discoM.event = function()
     if discobC >= dscbC then
       softcut.enable(5,1)
       softcut.enable(6,1)
-      local newPos = (math.random()*(lEnd-lStrt)) + lStrt
+      local newPos = (math.random()) 
       softcut.position(5,newPos)
       softcut.position(6,newPos)
       softcut.rec_level(5,0.8)
