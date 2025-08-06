@@ -38,7 +38,7 @@ the following allows for quick controls over the buffer length, ( performed in v
 
 * K2 (long press > 1 sec) = clears loop length and restores default length set in params menu
 
-
+* K3 (long press > 1 sec) = clear loop contents, total erasure
 
 for quick reference here are some controls mentioned in the video
 
