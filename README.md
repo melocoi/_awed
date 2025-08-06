@@ -92,11 +92,30 @@ synth(FREQ) = (ROOT NOTE) * (random(HARMONIC))
 
 
 <img src="https://ululo.co/image/_awed_root.png" width=300></img>
+root note
 
 <img src="https://ululo.co/image/_awed_harmonics.png" width=300></img>
+harmonics
 
 
+TUNING
 
+_awed has a tuning system that allows you to set the ROOT FREQ directly, entering a number in Hz, or by selecting a ROOT NAME, such as C2 or E3. You also have two modes of temperament, JUST INTONATION and EQUAL TEMPERAMENT. You can refer to other resources for more information on this topic, it is quite a deep rabbit hole, and utterly fascinating. However, for a more immediate and functional understanding, if you want to be in tune with a "traditional" synth, or a piano, or guitar, stick to the ET mode and choosing a ROOT NAME. To be more adventorous, Choose your ROOT FREQ directly and set it to JI. 
+
+You can further customize the 'flavor' of Just Intonation by going into _awed.lua directly, using Maiden, and editing the <i>justI</i> table. it looks like this...
+
+
+```
+-- to change your flavor of Just Intonation
+-- Comment and Uncomment the lines to select which JI intervals you want.
+-- Or make your own!!!
+-------------------------------------------------------------------------------------------------------------
+justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8 } -- "normal"
+--justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8 } --"Ptolemy"
+--justI = { 1/1, 17/16, 9/8, 19/16, 5/4, 21/16, 11/8, 3/2, 13/8, 27/16, 7/4, 15/8 } --"overtone"
+--justI = { 1/1, 16/15, 8/7, 32/27, 16/13, 4/3, 16/11, 32/21, 8/5, 32/19, 16/9, 32/17 } -- "undertone"
+```
+The final step to the tuning process is to choose your SCALE. At this point you will be ready to play all the notes you could ever dream of, and then some.
 
 
 
