@@ -17,6 +17,7 @@
 -- to change your flavor of Just Intonation
 -- Comment and Uncomment the lines to select which JI intervals you want.
 -- Or make your own!!!
+-- when creating your own, please ensure you make a table with 12 entries.
 -------------------------------------------------------------------------------------------------------------
 justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8 } -- "normal"
 --justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8 } --"Ptolemy"
