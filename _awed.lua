@@ -658,6 +658,7 @@ g.key = function(x,y,z)
       end
       loadKBawed()
     end
+    g:refresh()
     -- create function to build specific page. 
   else
     if columns < 16 then -- do we have a smaller grid????
