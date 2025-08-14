@@ -14,15 +14,18 @@
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
+--///////////////////////////////////////////////////////////////////////////////////////////////////////////
+--///////////////////////////////////////////////////////////////////////////////////////////////////////////
 -- to change your flavor of Just Intonation
 -- Comment and Uncomment the lines to select which JI intervals you want.
 -- Or make your own!!!
--- when creating your own, please ensure you make a table with 12 entries.
 -------------------------------------------------------------------------------------------------------------
 justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8 } -- "normal"
 --justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8 } --"Ptolemy"
 --justI = { 1/1, 17/16, 9/8, 19/16, 5/4, 21/16, 11/8, 3/2, 13/8, 27/16, 7/4, 15/8 } --"overtone"
 --justI = { 1/1, 16/15, 8/7, 32/27, 16/13, 4/3, 16/11, 32/21, 8/5, 32/19, 16/9, 32/17 } -- "undertone"
+--///////////////////////////////////////////////////////////////////////////////////////////////////////////
+--///////////////////////////////////////////////////////////////////////////////////////////////////////////
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,7 +69,13 @@ izz = {} -- table for led intensity clock
 tT = {} -- table of selected harmonics
 tM1 = {} -- table for mutator 1 notes
 tM2 = {} -- table for mutator 1 notes
+
+-- cconnecting grid and checking if it is 8 or 16 columns (for X axis) 
 g = grid.connect()
+
+columns = g and g.device.cols
+XoffSet = 0
+gPage = 1 -- default start page if < 16 columns (page 0 and page 1)
 
 --adding softcut stuff
 vol = 1
@@ -231,16 +240,18 @@ function init()
   
   tT[1] = 1
   
-  g:led(13,1,15)
-  g:led(12,1,15)
-  g:led(12,8,1)
-  loadLED(12,1,1)
-  loadMutator1(11,1)--init Mutator 1
-  loadMutator1(11,3)--with shell voicing
-  loadMutator1(11,6)--maj7 chord
-  loadMutator2(10,1)--init Mutator 2
-  loadMutator2(10,3)--with shell voicing
-  loadMutator2(10,7)--maj7 chord
+  
+  -- need to check for which grid, and adjust accordigly
+  
+  if columns < 16 and gPage == 1 then
+    XoffSet = 8
+  elseif columns == 16 then
+    gPage = 0
+  end
+    
+  
+  initKB()
+  
   
   
   -- start the clocks
@@ -278,16 +289,29 @@ function init()
     id = "rootFreq",
     name = "Root Frequency",
     min = 1,
-    max = 160,
+    max = 110,
     default = 60,
-    formatter = function(param) return (param:get().." Hz") end,
+    formatter = function(param) 
+      
+      return (param:get().." Hz") 
+      end,
     action = function() build_Root(params:get("rootFreq")) end
   } 
   
    
   params:add{type = "number", id = "root_note", name = "Root Note",
-    min =30, max = 48, default = 36, formatter = function(param) return MusicUtil.note_num_to_name(param:get(), true) end,
-    action = function() build_Root(MusicUtil.note_num_to_freq(params:get("root_note"))) end} -- by employing build_scale() here, we update the scale
+    min =1, max = 45, default = 36, formatter = function(param) return MusicUtil.note_num_to_name(param:get(), true) end,
+    action = function()
+      local value = MusicUtil.note_num_to_freq(params:get("root_note"))
+      build_Root(value) 
+      value = value * 100
+      value = math.floor(value)
+      value = value / 100
+      print(value)
+      params:set("rootFreq",value)
+      end
+    
+  } -- by employing build_scale() here, we update the scale
    params:add_text("text4", "param is set when adjusted", "")
   params:add_text("blank2", "", "")
   params:add_text("text5", "now choose", "")
@@ -487,6 +511,18 @@ function init()
   loadKBawed()
 end
 
+function initKB()
+  g:led(13 - XoffSet,1,15)
+  g:led(12 - XoffSet,1,15)
+  g:led(12 - XoffSet,8,1)
+  loadLED(12 - XoffSet,1,1)
+  loadMutator1(11 - XoffSet,1)--init Mutator 1
+  loadMutator1(11 - XoffSet,3)--with shell voicing
+  loadMutator1(11 - XoffSet,6)--maj7 chord
+  loadMutator2(10 - XoffSet,1)--init Mutator 2
+  loadMutator2(10 - XoffSet,3)--with shell voicing
+  loadMutator2(10 - XoffSet,7)--maj7 chord
+end
 
 function setRstChnc()
   rstChnc =  (100 - params:get("rstChnc1") )/100
@@ -608,8 +644,28 @@ end
 
 -- which grid key is pressed
 g.key = function(x,y,z)
- keyboardAwed(x,y,z)
-
+  
+  if z1 and z == 1 then
+    if columns < 16 then -- do we have a smaller grid????
+      -- add grid page switch here?????
+      print("grid 64!!!!")
+      if gPage == 1 then
+        gPage = 0
+        XoffSet = 0
+      else
+        gPage = 1
+        XoffSet = 8
+      end
+      loadKBawed()
+    end
+    -- create function to build specific page. 
+  else
+    if columns < 16 then -- do we have a smaller grid????
+      x = x + XoffSet
+    end
+    print(x)
+    keyboardAwed(x,y,z)
+  end
 end
 
 
@@ -621,16 +677,16 @@ function keyboardAwed(x,y,z)
     loadLED(x,y,z)
     
     if x < 9 then
-      playSawed(x,y)
+      playSawed(x ,y)
       --print('played')
     end
     
     if x == 9 then
-      loadDiscob(x,y)
+      loadDiscob(x ,y)
     end
      
     if x == 10 then
-      loadMutator2(x,y)
+      loadMutator2(x ,y)
     end
     
     if x == 11 then
@@ -639,12 +695,12 @@ function keyboardAwed(x,y,z)
  
     
     if x > 12 then
-      loadHarms(x,y)
+      loadHarms(x ,y)
     end
     
   end
   
- if x == 12 and y < 8 then
+ if x == 12  and y < 8 then
       --loadLED(x,y,z)
      if z == 1 then
       r = root[y]
@@ -667,70 +723,72 @@ function loadKBawed()
     table.insert(izz,3) 
   end
   iz = 0
-  for x = 1 , 8 do
-    for y = 1, 8 do
-      iz = iz + 1
-      g:led(x,y,izz[iz])
-      
-    end
-  end
-  print('loaded sawed')
--- load mutator1
-for x = 10, 12 do
-  if x == 10 then
-    for y = 1 , 8 do
-      if tM2[y] == nil then
-        g:led(x,y,2)
+  if gPage == 1 then
+  
+  else
+    for x = 1 , 8 do
+      for y = 1, 8 do
+        iz = iz + 1
+        g:led(x,y,izz[iz])
+        
       end
     end
-     for y = 1 , 8 do
-      if tM2[y] == y then
-        g:led(x,y,15)
-      end
-    end
-     print('loaded mutator1')
+     print('loaded sawed')
   end
  
-  if x == 11 then
-    for y = 1 , 8 do
-      if tM1[y] == nil then
-        g:led(x,y,2)
-      elseif tM1[y] == y then
-        g:led(x,y,15)
+-- load mutator1
+  for x = 10 , 12  do
+    if x == 10  then
+      for y = 1 , 8 do
+        if tM2[y] == nil then
+          g:led(x - XoffSet,y,2)
+        elseif tM2[y] == y then
+          g:led(x - XoffSet,y,15)
+        end
       end
+     print('loaded mutator1')
     end
-    print('loaded mutator2')
-  end
+ 
+    if x == 11then
+      for y = 1 , 8 do
+        if tM1[y] == nil then
+          g:led(x - XoffSet,y,2)
+        elseif tM1[y] == y then
+          g:led(x - XoffSet,y,15)
+        end
+      end
+      print('loaded mutator2')
+    end
   
 -- load rootNote and bLong
-  if x == 12 then
-    for y=1,8 do
-      if y == 8 then
-        if bLong then
-          g:led(x,y,8)
+    if x == 12  then
+      for y=1,8 do
+        if y == 8 then
+          if bLong then
+            g:led(x - XoffSet,y,8)
+          else
+            g:led(x - XoffSet,y,1)
+          end
+        
+        elseif r == root[y] then
+          g:led(12 - XoffSet,y,15)
         else
-          g:led(x,y,1)
+          g:led(12 - XoffSet,y,3)
         end
-      
-      elseif r == root[y] then
-        g:led(12,y,15)
-      else
-        g:led(12,y,3)
       end
+       print('loaded root')
     end
-     print('loaded root')
-  end
  
 end
   --load harmonics
   isz = 0
-  for x = 13,16 do
+  for x = 13, 16 do
     for y = 1,8 do
       isz = isz + 1
       if tT[isz] == nil then
-        g:led(x,y,0)
+        g:led(x - XoffSet,y,0)
       elseif tT[isz] == isz then
-        g:led(x,y,15)
+        g:led(x - XoffSet,y,15)
       end
     end
   end
@@ -785,34 +843,37 @@ end
 function loadLED(x,y,z)
   
 -- launch saws into the ether  
-  iz = 0
-    for ix = 1,8 do
-      
-        for iy = 1,8 do
-            
-            iz = iz + 1
-            
-            if ix == x and iy == y then
-             
-              izz[iz] = math.floor((x*y)+x+y+(x/2))
-              
-              g:led(ix,iy,izz[iz])
+  if gPage == 1 then
   
-            elseif izz[iz] > 1 and z ~= 1 then
-              izz[iz] = izz[iz]-1
-              g:led(ix,iy,izz[iz])
-            end
-       end
-    end
+  else
+    iz = 0
+      for ix = 1,8 do
+        
+          for iy = 1,8 do
+              
+              iz = iz + 1
+              
+              if ix == x and iy == y then
+               
+                izz[iz] = math.floor((x*y)+x+y+(x/2))
+                
+                g:led(ix,iy,izz[iz])
     
+              elseif izz[iz] > 1 and z ~= 1 then
+                izz[iz] = izz[iz]-1
+                g:led(ix,iy,izz[iz])
+              end
+         end
+      end
+    end
 -- root note selector    
   if x == 12 and y < 8 then
     for iy = 1,7 do
-      g:led(x,iy,3)
+      g:led(x- XoffSet,iy,3)
     end
     ry = y
     r = root[y]
-    g:led(x,y,15)
+    g:led(x - XoffSet,y,15)
  --[[ if z == 1 then
       
       sT = util.time()
@@ -829,27 +890,27 @@ function loadLED(x,y,z)
   if x == 12 and y == 8 then
     if bLong then
       bLong = false
-      g:led(x,y,1)
+      g:led(x- XoffSet,y,1)
     else
       bLong = true
-      g:led(x,y,8)
+      g:led(x- XoffSet,y,8)
     end
   end 
   
 -- set discomb
   if x == 9 then
     if y == discobC then
-      g:led(x,y,0)
+      g:led(x- XoffSet,y,0)
        for iy = 1,8 do
-      g:led(x,iy,0)
+      g:led(x- XoffSet,iy,0)
        end
     else
       for iy = 1,8 do
-        g:led(x,iy,0)
+        g:led(x- XoffSet,iy,0)
       end
       
       for iy = 1,y do
-        g:led(x,iy,15)
+        g:led(x- XoffSet,iy,15)
       end
     end
     
@@ -871,6 +932,7 @@ function loadDiscob(x,y)
 end
 
 function loadHarms(x,y)
+  
 iz = 0
     for ix = 13,16 do
       
@@ -881,11 +943,11 @@ iz = 0
             if ix == x and iy == y then
               if tT[iz] == nil then
                 tT[iz] = iz
-                g:led(x,y,15)
+                g:led(x- XoffSet,y,15)
               elseif tT[iz] == iz then
                 --print(iz)
                 tT[iz] = nil
-                g:led(x,y,0)
+                g:led(x- XoffSet,y,0)
               end
               
             end
@@ -908,11 +970,11 @@ iz = 0
       if iy == y then
         if tM1[iz] == nil then
           tM1[iz] = iz
-          g:led(x,y,15)
+          g:led(x- XoffSet,y,15)
         elseif tM1[iz] == iz then
           --print(iz)
           tM1[iz] = nil
-          g:led(x,y,2)
+          g:led(x- XoffSet,y,2)
         end
         
       end
@@ -934,11 +996,11 @@ iz = 0
       if iy == y then
         if tM2[iz] == nil then
           tM2[iz] = iz
-          g:led(x,y,15)
+          g:led(x- XoffSet,y,15)
         elseif tM2[iz] == iz then
           --print(iz)
           tM2[iz] = nil
-          g:led(x,y,2)
+          g:led(x- XoffSet,y,2)
         end
         
       end
