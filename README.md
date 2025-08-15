@@ -117,6 +117,78 @@ justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8 } -- 
 ```
 The final step to the tuning process is to choose your SCALE. At this point you will be ready to play all the notes you could ever dream of, and then some.
 
+**PLAYING**
+
+Once you have your tuning worked out, a ROOT NOTE selected, and some HARMONCS picked out, it is now time to play. This is accomplished by using the keys in the ENVELOPE GRID section. 
+
+Each key in this section will launch a synth with an envelope related to the key that is pressed. Basically, envelopes are shortest to longest from right to left and top to bottom. 
+
+The formula for the envelope is in the code… (line 828 of _awed.lua)
+```
+  engine.atk(x+y)
+  engine.rel(x*y)
+  engine.sus(x/2)
+
+```
+This is in seconds, so the shortest envelope possible is at grid 1,1 (which is the top right corner of the grid) and it will be 3.5 seconds long.
+
+atk(1+1) + rls(1*1) + sus(1/2) = 2 + 1 + 0.5 = 3.5
+
+From this we can see that the envelope is more or less symetrical on the top row of the grid, and as we move down the grid (which will increase the y value) we quickly begin to significantly increase the release stage of the envelope. The bottom left grid key (8,8) would have the following envelope
+
+atk(8+8) + rls(8*8) + sus(8/2) = 16 + 64 + 4 = 84 seconds long
+
+and the bottom right grid key (1,8) would be
+
+atk(1+8) + rls(1*8) + sus(1/2) = 9 + 8 + 0.5 = 17.5 seconds long
+
+for completionists sake, the top left grid key (8,1)
+
+atk(8+1) + rls(8*1) + sus (8/2) = 9 + 8 + 4 = 21 seconds long
+
+One thing that may be confusing about the interface is the way the lights are indicating the volume envelope. Because the lights reduce in brightness and go dark before brightening up again, which can give the visual impression that the envelope is repeating itself. This is not the case. The audio envelope cycles once. However, visually, the key will change in brightness every second and cycle through from brightest to darkest until the envelope completes. 
+
+You are free to launch as many synths as you would like, although it is possible to overload the CPU of your Norns if too many synths are playing. This can be heard as a crackling sound. You can also keep track of CPU load by looking at the Norns menu screen. I deliberately chose not to limit the amounts of synths that are launchable because this is a musical instrument that the player needs to learn and become familiar with the limits, so they may be able to push them when they so choose. 
+
+**FILTER**
+
+ENC2 allows you to adjust the filtering applied to the saw wave. It's default setting is the highest Q factor and produces, essentially, a sine wave. Turning clockwise will open up the filter to allow the full harmomnic spectrum of the saw wave through. This is indicated on screen by the randomly drawn lines getting thicker or thinner based on how open or closed the filter is. 
+
+**PEC/LONG TONE**
+
+There are two distinct modes available. PERC, or percussion, and LONG TONE. 
+
+The LONG TONE mode is indicated when the grid key is illuminated. In this mode the synth sounds like you would expect with a traditional synth, providing long sustained tones. 
+
+In PERC mode things are a little different. When lauching a synth, we are greeted with a regular series of short envelopes triggered at a constant tempo. At least this is what it sounds like. In fact, what is happening is that the synth is playing back at such a low frequency the sound is perceived as a series of clicks. With the filtering applied, the clicks can be shaped into what sounds kind of like a Marimba, in a pinged filter sort of way. Or it can be raw noisy clicks with the filter open. 
+
+The rhythms are effectd by which envelope key you press.
+
+The formula is as follows found at line 820 of _awed.lua
+
+```
+mults[y]*(x*x)
+```
+
+This formula is based on a table called "mults" which is defined as mults = {1, 1/2, 1/3, 1/4, 1/5, 1/6, 1/7, 1/8}
+
+For an example, pressing key 5,3 (which is 5 down and 3 from the left) would provide the following tempo of clicks...
+mults[3] = 1/3
+(1/3) * (5 * 5) = 8.333...Hz or 498 BPM
+
+key 8,8 (the top left key) would give us the following
+mults[8] = 1/8
+(1/8) * (1 * 1) = 0.125Hz or 7.5 BPM
+
+.................................................................................
+
+.................................................................................
+
+.................................................................................
+
+# the TAPE LOOP
+
+coming soon!!!!!!!!!
 
 
 
