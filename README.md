@@ -173,11 +173,15 @@ mults[y]*(x*x)
 This formula is based on a table called "mults" which is defined as mults = {1, 1/2, 1/3, 1/4, 1/5, 1/6, 1/7, 1/8}
 
 For an example, pressing key 5,3 (which is 5 down and 3 from the left) would provide the following tempo of clicks...
+
 mults[3] = 1/3
+
 (1/3) * (5 * 5) = 8.333...Hz or 498 BPM
 
 key 8,8 (the top left key) would give us the following
+
 mults[8] = 1/8
+
 (1/8) * (1 * 1) = 0.125Hz or 7.5 BPM
 
 .................................................................................
