@@ -196,7 +196,7 @@ mults[8] = 1/8
 # the TAPE LOOP
 
 
-_awed is listening to and recording everything, by default, to a stereo softcut buffer. 
+_awed is listening to and recording everything, by default, to a stereo softcut buffer. From the engine, but also, form the audio inputs! 
 
 The default length of this buffer is 22 seconds long, which means whatever you played right now, you will hear again in 22 seconds. Also by default is a decay that will cause the echoes to slowly fade into nothingness over time. This loop is played back at a normal rate, which means you will hear it the same way you played it. For the most part. There is a built in tape wobble, a slow changing and low amplitude adjustment to the rate of playback, just enough to encourage beating tones. Not enough to completely detune the sounds. 
 
