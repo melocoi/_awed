@@ -8,6 +8,9 @@ for norns w/grid
 
 <a href="https://youtu.be/SwtadkessjA?si=uh_lT5BKscTG2Giv"> video performance/tutorial </a>
 
+and some additional videos to be found here
+<a href="https://ululo.co/_awed.html">_awed DEMO vids</a>
+
 here are some of the key combos that are not in the video, but may be helpful
 
 * K1 + Enc 2 = main buffer Record amplitude
@@ -192,9 +195,105 @@ mults[8] = 1/8
 
 # the TAPE LOOP
 
-coming soon!!!!!!!!!
+
+_awed is listening to and recording everything, by default, to a stereo softcut buffer. 
+
+The default length of this buffer is 22 seconds long, which means whatever you played right now, you will hear again in 22 seconds. Also by default is a decay that will cause the echoes to slowly fade into nothingness over time. This loop is played back at a normal rate, which means you will hear it the same way you played it. For the most part. There is a built in tape wobble, a slow changing and low amplitude adjustment to the rate of playback, just enough to encourage beating tones. Not enough to completely detune the sounds. 
+
+There are controls for the amount of sound that is preserved, recorded, or heard from this main buffer, listed at the top, but here again...
+
+* K1 + Enc 2 = main buffer Record amplitude
+  
+  [ indicated on screen by the bg square color ]
+  
+  will effect how loud the harmonics will be recorded to the buffer.
+
+* K1 + Enc 3 = buffer Preserve amplitude
+  
+  [ indicated on screen by the size of the circle ]
+
+  will efffect how long the decay of the delay is
+
+* K1 + Enc 1 = main buffer Amplitude
+
+  [ indicated on screen by the color inside the circle ]
+
+  control the overall volume of the recorded buffers
+
+There are also several ways to control the rate of playback/pitch of the buffer. The first and most obvious is with Encoder 1...
+
+  * Enc 1 = buffer playback rate
+  
+     [ indicated on screen by the size of the bg square ]
+  
+    the rate is quantized to the scale selected for the synth, set in the params menu. Can also adjust the rate slew.
 
 
+The parameters menu has a rate slew variable that will allow you to change the amount of time it takes for the rate changes to take effect. The default is 12 seconds. Keep in mine that the rate slew is also used by the tape wobble, so if you lower it to zero, you may hear steppy glitches as the tape periodically changes speed. This could be intentional. 
+
+Another way in which the overall rate of the buffer can be manipulated is by doing a long press on a ROOT NOTE grid key. Which will then change the root rate of the buffer to the selection. 
+
+Changes to the rate of the tape buffer will have an effect on the new material being recorded to it. If the rate is changing while a constant tone is being recorded, on playback it will sound like a glissando up or down instead of a constant pitch. 
+
+There are also ways to change the total duration of the tape loop. In the parameters menu you can increase the total length of the loop. As well as define a start and end point within the total length.
+
+The start and end point are also settable from the panel with the following ...
+
+  * K2 = set Loop start
+  
+  * K3 = set Loop end
+  
+  * K2 (long press > 1 sec) = clears loop length and restores default length set in params menu
+  
+  * K3 (long press > 1 sec) = clear loop contents, total erasure
+
+**MUTATOR**
+
+The MUTATOR has several parameters to help control/sculpt their activity but are mostly autonomous agents of change. The parmeters are...
+
+REST percentage, the chance a mutator will not sound.
+REVERSE percentage, the chance the mutator will play in reverse.
+AMPLITUDE , the loudest level for the mutator. 
+
+Within these parameters a mutator will play content from some point in the buffer, for some duration of time. 
+
+These are mono play heads that will playback material from one of the left or right stereo buffers at a pitch ratio that is selected from the MUTATOR grid key rows, found just above the ROOT Note selection row. 
+
+**DISCOMBOBULATOR**
+
+the final method for manipulating the buffer is the Discombobulator. A mechanism that will rearrange or erase the contents of the buffer.
+
+This is engaged by the row above the Mutators. 
+
+From right to left you have the ability to select the chance of discombobulation. Which is essential a 1 in 8 chance, 2 in 8, 3 in, 8 etc.
+
+In the parmeters menu you will find ways to adjust the TIME and AMPLITUDE.
+
+The TIME determines how big the chunk of time that gets discombobulated could be. 
+
+The AMPLITUDE is how much, or little, of the signal is preserved in the discombobulation. 
+
+There is very little control over this part, I find that in practice, for me, less is more. It is something to be done occaisionally to introduce glitches. Or as a way to erase everything. 
+
+.................................................................................
+
+.................................................................................
+
+.................................................................................
+
+# the End????
+
+...is it? I've only just begun exploring the possibilities that are already here. I am starting to post a few more demo videos that can be found here...
+
+<a href="https://ululo.co/_awed.html">_awed DEMO vids</a>
+
+As others play along I would love to help them realize their own goals with this instrument. 
+
+As for my own goals, I'm taking this engine a step further and buildig a laptop version, which is where this all started, that is to be used for multichannel sound deployments. I have a failry simple system of bluetooth speakers that I can deploy anywhere to have a portable ambisonic performance setup. Imagine parks, trails, alleys, and squares, as venues and you may start to get the idea. And of course, I would be happy to share details and code as they develop. 
+
+Thank you so much for your time and interest. 
+
+- Darren "ululo" Russell
 
 
 
