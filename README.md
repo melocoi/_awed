@@ -285,7 +285,7 @@ The TIME determines how big the chunk of time that gets discombobulated could be
 
 The AMPLITUDE is how much, or little, of the signal is preserved in the discombobulation. 
 
-There is very little control over this part, I find that in practice, for me, less is more. It is something to be done occaisionally to introduce glitches. Or as a way to erase everything. 
+There is very little control over this part. There is also the potential for feedback when the AMPLITUDE is high. and the TIME is long. This has the potential to be desirable or undesirable. I find that in practice, for me, less is more. It is something to be done occaisionally to introduce glitches. Or as a way to erase everything. 
 
 .................................................................................
 
