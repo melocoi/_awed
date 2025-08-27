@@ -187,6 +187,18 @@ mults[8] = 1/8
 
 (1/8) * (1 * 1) = 0.125Hz or 7.5 BPM
 
+**PANNING**
+
+In the most recent update a few parameters have been added to the Synth Engine section. These are Drift Speed, Drift Spread, and Drift Wrap. Which will effect the way that the stereo image is generated and manipulated. Currently, and previously, each time a synth is launched, a stereo position is randomly determined for it. And it remained static throughout the life of the synth. Now, with the new controls, you are able to add some motion to the stereo placement of the synth. Creating an even more dynamic stereo field. The origin of the sound is still randomly determined, but how it behaves after creation is now adjustable.
+
+The first parameter is DRIFT SPEED. This is the rate at which the sound will move in the stereo field. 
+
+The second parameter is DRIFT SPREAD. This is the distance from the origin that the sound will travel. A value of 1 will ensure that the sound will travel across the full stereo field.
+
+Finally we have DRIFT WRAP. By default this is set to 0, or off, when set to 1, or on, you will hear sounds that reach the extremeties of the stero field wrap over to the opposite side. In actuality it is more of a hop, when in long tone this is more obvious as there will be a sudden pop as it travels. Which adds some percussivity to the drones. 
+
+These new parameters provide quite a bit of new sonic territory to explore, not just with an increased undulation of tones across the stereo field, but when we increase the DRIFT SPEED into higher frequencies, vibrato/tremolo/esque effects can be acheived. Even higher rates introduce a kind of distortive quality, a bit like an FM synthesis, only here it would be PM, which has really made me smile with some of the results. 
+
 .................................................................................
 
 .................................................................................
