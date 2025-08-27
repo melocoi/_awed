@@ -10,10 +10,15 @@ Engine_Sawed : CroneEngine {
 		// ** add your SynthDefs here **
 		SynthDef("Sawed", {
 
-			arg atk, sus, rel, c1, c2, freq, fMult, detune, pan, cfhzmin, cfhzmax, cfmin, cfmax, rqmin, rqmax,lsf, ldb, amp, out = 0;
+			arg atk, sus, rel, c1, c2, freq, fMult, detune, pan, driftSpeed, driftSpread,driftStart, wrap, cfmin, cfmax, rqmin, rqmax,lsf, ldb, amp, out = 0;
 
 			var sig, env;
 
+      pan = Select.kr(wrap,[
+      	SinOsc.kr(driftSpeed,0,driftSpread,driftStart),
+      	SinOsc.kr(driftSpeed,0,driftSpread,driftStart+1).mod(2)-1
+      ]);
+      
 			env = EnvGen.kr(Env([0,1,1,0], [atk,sus,rel], [c1,0, c2]), doneAction:2);
 
 			sig = Saw.ar((freq) *{LFNoise1.kr(0.25,detune).midiratio}!2);
@@ -47,8 +52,10 @@ Engine_Sawed : CroneEngine {
 			\fMult, 1,
 			\detune, 0.02,
 			\pan, 0,
-			\cfhzmin, 0.1,
-			\cfhzmax, 0.2,
+			\driftSpeed, 0.125,
+			\driftSpread, 0.3,
+			\driftStart, 0,
+			\wrap, 0,
 			\cfmin, 100,
 			\cfmax, 101,
 			\rqmin,0.005,

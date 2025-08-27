@@ -20,10 +20,15 @@
 -- Comment and Uncomment the lines to select which JI intervals you want.
 -- Or make your own!!!
 -------------------------------------------------------------------------------------------------------------
-justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8 } -- "normal"
---justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8 } --"Ptolemy"
---justI = { 1/1, 17/16, 9/8, 19/16, 5/4, 21/16, 11/8, 3/2, 13/8, 27/16, 7/4, 15/8 } --"overtone"
---justI = { 1/1, 16/15, 8/7, 32/27, 16/13, 4/3, 16/11, 32/21, 8/5, 32/19, 16/9, 32/17 } -- "undertone"
+--justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8, 2/1 } -- "normal"
+justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8, 2/1 } --"Ptolemy"
+--justI = { 1/1, 17/16, 9/8, 19/16, 5/4, 21/16, 11/8, 3/2, 13/8, 27/16, 7/4, 15/8, 2/1 } --"overtone"
+--justI = { 1/1, 16/15, 8/7, 32/27, 16/13, 4/3, 16/11, 32/21, 8/5, 32/19, 16/9, 32/17 2/1} -- "undertone"
+
+-- the following aren't just intonation, but derive from some calculations based on the Tocante synths by Peter Blasser
+--justI = { 1/1, 267/250, 333.333/250, 365.85/250, 384.61/250, 500/250, 535.71/250, 555.55/250, 731.70/250, 769.23/250, 833.33/250, 1071.42/250, 1111.11/250 } -- red
+--justI = {1/1, 220.58/200, 272.72/200, 300/200, 319.14/200, 400/200, 441.17/200, 454.54/200, 600/200, 638.29/200, 681.81/200, 882.35/200, 909.09/200} -- green
+
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,11 +77,14 @@ tM2 = {} -- table for mutator 1 notes
 
 -- cconnecting grid and checking if it is 8 or 16 columns (for X axis) 
 g = grid.connect()
+if g.device == nil then
+  columns = 0
+else
+  columns = g and g.device.cols
+end
 
-columns = g and g.device.cols
-XoffSet = 0
-gPage = 1 -- default start page if < 16 columns (page 0 and page 1)
-
+ XoffSet = 0
+  gPage = 1 -- default start page if < 16 columns (page 0 and page 1)
 --adding softcut stuff
 vol = 1
 rec = 1.0
@@ -93,11 +101,15 @@ newLow = 1245
 dAmp = 1 -- discombobulator volume
 dbTime = 2
 tapeWobble = 1
+
 -- for Engine
 rq = 0.01
 amp = 1.5
 ampFac = 0.3
 dTune = 1
+driftSpeed = 0.125
+driftSpread = 0.3
+driftStart = 0
 
 --for screen
 scX = 0
@@ -120,6 +132,7 @@ mRte = rte/2
 fin = false
 rstChnc = 0.7
 revChnc = 0.5
+micChnc = 0.9
 pan1 = 1
 mutLvl1 = 1
 
@@ -129,10 +142,10 @@ m1.event = function()
   
   if mutate then
     m1.time = math.random()+math.random(1,(lEnd-lStrt))
-    mPos = math.random()
+    mPos = math.random()+math.random(1,(lEnd-lStrt))
     local newNote = table.randFrom(tM1)
+   
      if newNote ~= nil then
-        --MnewRate = MusicUtil.interval_to_ratio(notes_nums[newNote]-notes_nums[1])/4*(math.random(2))
         MnewRate = justI[notes_nums[newNote]]/4*math.random(2)
       else
         MnewRate = 0
@@ -143,9 +156,19 @@ m1.event = function()
     sft.updateSlew(3,m1.time*3)
     sft.mutator(3,m1.time*3,MnewRate,((math.random(90,175)/100)*mutLvl1),pan1)
     softcut.position(3,mPos)
+    local rando = math.random()
+    if rando > micChnc then
+      local newStart = math.random(1,lEnd)
+      local newDur = lEnd - math.random(newStart,lEnd)
+      softcut.loop_start(3,newStart)
+      softcut.loop_end(3,newStart+newDur)
+      print(newStart, newStart+newDur)
+    else
+      softcut.loop_start(3,1)
+      softcut.loop_end(3,lEnd)
+    end
     mutate = false
-    --print(MnewRate)
-    
+   
   else
     sft.mutator(3,m1.time*3,MnewRate,0,pan1*-1)
     fin = true
@@ -177,6 +200,7 @@ mRte2 = rte/2
 fin2 = false
 rstChnc2 = 0.5
 revChnc2 = 0.5
+micChnc2 = 0.9
 pan2 = -1
 mutLvl2 = 1
 
@@ -186,9 +210,9 @@ m2.event = function()
   
   if mutate2 then
     m2.time = math.random()+math.random(1,(lEnd-lStrt))
-    mPos2 = math.random()
+    mPos2 = math.random()+math.random(1,(lEnd-lStrt))
     local newNote = table.randFrom(tM2)
-   -- print(newNote)
+   
       if newNote ~= nil then
         -- it was -40
         MnewRate2 = justI[notes_nums[newNote]]/2*(math.random(2)*2) 
@@ -203,8 +227,20 @@ m2.event = function()
     sft.updateSlew(4,m2.time*3)
     sft.mutator(4,(m2.time*6),MnewRate2,((math.random(60,100)/100)*mutLvl2),pan2)
     softcut.position(4,mPos2)
+    local rando = math.random()
+    if rando > micChnc2 then
+      local newStart = math.random(1,lEnd)
+      local newDur = lEnd - math.random(newStart,lEnd)
+      softcut.loop_start(4,newStart)
+      softcut.loop_end(4,newStart+newDur)
+      print(newStart, newStart+newDur)
+    else
+      softcut.loop_start(4,1)
+      softcut.loop_end(4,lEnd)
+    end
+    
     mutate2 = false
-    --print(MnewRate2)
+   
     
   else
     sft.mutator(4,(m2.time*3),MnewRate2,0,pan2*-1)
@@ -242,7 +278,7 @@ function init()
   
   
   -- need to check for which grid, and adjust accordigly
-  
+ 
   if columns < 16 and gPage == 1 then
     XoffSet = 8
   elseif columns == 16 then
@@ -263,9 +299,12 @@ function init()
   --adding softcut stuff
   sft.init()
 
-  -- params setup
-  params:add_separator("synth_params", "synth engine variables")
   
+  -- params setup
+  
+  params:add_separator("awed","_awed parameters")
+  
+  params:add_group("Synth Engine",4)
   params:add{
     type = "number",
     id = "dTune",
@@ -273,9 +312,59 @@ function init()
     min = 1,
     max = 400,
     default = 100,
-    formatter = function(param) return (param:get().." %") end,
+    formatter = function(param)
+      return (param:get().." %") end,
     action = function() dTune = params:get("dTune")/100 end
   }
+  
+  params:add{
+    type = "number",
+    id = "driftSpeed",
+    name = "Drift Speed",
+    min = 1,
+    max = 4000,
+    default = 12.5,
+    formatter = function(param)
+      local dSpeed = params:get("driftSpeed")/100
+      return (dSpeed.."Hz") end,
+    action = function() 
+      driftSpeed = params:get("driftSpeed")/100
+      engine.driftSpeed(driftSpeed)
+      end
+  }
+  
+  params:add{
+    type = "number",
+    id = "driftSpread",
+    name = "Drift Spread",
+    min = 1,
+    max = 100,
+    default = 40,
+    formatter = function(param)
+      local dSpread = params:get("driftSpread")/100
+      return (dSpread.." ") end,
+    action = function() 
+      driftSpread = params:get("driftSpread")/100
+      engine.driftSpread(driftSpread)
+      end
+  }
+  
+  params:add{
+    type = "number",
+    id = "wrap",
+    name = "Drift Wrap",
+    min = 0,
+    max = 1,
+    default = 0,
+    formatter = function(param)
+      return (param:get().."") end,
+    action = function() 
+      wrap = params:get("wrap")
+      engine.wrap(wrap)
+      end
+  }
+  
+  
   -- scale and tuning params
   params:add_group("Tuning",17)
   
@@ -307,7 +396,7 @@ function init()
       value = value * 100
       value = math.floor(value)
       value = value / 100
-      print(value)
+     
       params:set("rootFreq",value)
       end
     
@@ -417,7 +506,7 @@ function init()
 -- adding mutator control params
 
   
-  params:add_group("Mutator Settings",6)
+  params:add_group("Mutator Settings",8)
   params:add{
     type = "number",
     id = "mutLvl1",
@@ -483,6 +572,28 @@ function init()
     formatter = function(param) return (param:get().." %") end,
     action = function() setRevChnc() end
   }
+  
+   params:add{
+    type = "number",
+    id = "micChnc1",
+    name = "mut 1 micro %",
+    min = 1,
+    max = 100,
+    default = 10,
+    formatter = function(param) return (param:get().." %") end,
+    action = function() setMicChnc() end
+  }
+  
+   params:add{
+    type = "number",
+    id = "micChnc2",
+    name = "mut 2 micro %",
+    min = 1,
+    max = 100,
+    default = 10,
+    formatter = function(param) return (param:get().." %") end,
+    action = function() setMicChnc() end
+  }
 
 -- adding discombobulator control params
 
@@ -509,6 +620,20 @@ function init()
   m2:start()
   r = root[1]
   loadKBawed()
+   if g.device == nil then
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print("no grid connected!!!!!!!!!!!!!!!!!!!!!!!")
+    print("this script will not work completely")
+    print("please connect a grid-like device")
+    print("at your earliest conveniance")
+    print("thank you")
+    print("but you can still use audio inputs")
+    print("and it might sound kind of cool")
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    --columns = 0
+  end
 end
 
 function initKB()
@@ -534,6 +659,11 @@ function setRevChnc()
   revChnc2 = (params:get("revChnc2") )/100
 end
 
+function setMicChnc()
+  micChnc =  (100 - params:get("micChnc1") )/100
+  micChnc2 = (100 - params:get("micChnc2") )/100
+end
+
 function setMutateLevel()
   mutLvl2 = params:get("mutLvl2")/100
   mutLvl1 = params:get("mutLvl1")/100
@@ -555,7 +685,7 @@ function build_Root(R)
   
  
     rootFreq = R
-    print("JUST!!!")
+    print("ROOT!!!!")
   
   build_scale()
 end
@@ -564,7 +694,7 @@ function build_scale()
   
   
   
-  notes_nums = MusicUtil.generate_scale_of_length(1, params:get("scale"), 8) -- builds scale
+  notes_nums = MusicUtil.generate_scale_of_length(1, params:get("scale"), 9) -- builds scale
   
   notes_freq = {}
   
@@ -664,7 +794,7 @@ g.key = function(x,y,z)
     if columns < 16 then -- do we have a smaller grid????
       x = x + XoffSet
     end
-    print(x)
+    --print(x)
     keyboardAwed(x,y,z)
   end
 end
@@ -750,7 +880,7 @@ function loadKBawed()
      print('loaded mutator1')
     end
  
-    if x == 11then
+    if x == 11 then
       for y = 1 , 8 do
         if tM1[y] == nil then
           g:led(x - XoffSet,y,2)
@@ -833,7 +963,7 @@ function playSawed(x,y)
   engine.freq(freq)
   engine.cfmin(n)
   engine.cfmax(n*1.001)
-  engine.pan(p)
+  engine.driftStart(p)
   engine.detune(detuned)
   engine.amp(amp)
   engine.hz(1)
@@ -1145,7 +1275,7 @@ function enc(n,d)
   elseif n==2 then
     rq = util.clamp(rq+d/100,0.01,1)
     redraw()
-    print(rq)
+    --print(rq)
   elseif n==3 and z1 then
     sft.sft_enc_pre(d)
    
