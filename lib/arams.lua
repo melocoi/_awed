@@ -173,7 +173,7 @@ function ar.init()
   
  -- params:add_separator("loop_settings", "loop settings")
   
-  params:add_group("Loop Settings",8)
+  params:add_group("Aggregator",8)
   scVoice = controlspec.AMP
   params:add_control("SC Amp","Main Loop Amp",scVoice)
   params:set("SC Amp",1)
@@ -255,7 +255,7 @@ function ar.init()
 -- adding mutator control params
 
   
-  params:add_group("Mutator Settings",8)
+  params:add_group("Mutator",8)
   params:add{
     type = "number",
     id = "mutLvl1",
