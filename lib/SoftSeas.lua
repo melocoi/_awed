@@ -140,12 +140,17 @@ discoM.event = function()
   
   if bDisco then
     local dscbC = math.random(8)
+    
     if discobC >= dscbC then
       softcut.enable(5,1)
       softcut.enable(6,1)
-      local newPos = (math.random()) 
-      softcut.position(5,newPos)
-      softcut.position(6,newPos)
+     -- local newPos = (math.random()) 
+      local newPos1 = math.random()+math.random(lStrt,lEnd)
+      local newPos2 = math.random()+math.random(lStrt,lEnd)
+      softcut.position(5,newPos1)
+      softcut.position(6,newPos2)
+      --softcut.loop_start(5,newPos1)
+      --softcut.loop_start(6,newPos2)
       softcut.rec_level(5,0.8)
       softcut.pre_level(5,0)
       softcut.rec_level(6,0.8)
@@ -153,7 +158,7 @@ discoM.event = function()
       dAmp = params:get("amplitude")
       softcut.level_cut_cut(1,5,dAmp)
       softcut.level_cut_cut(2,6,dAmp)
-      --print(newPos)
+      --print(newPos1)
     else
       softcut.enable(5,0)
       softcut.enable(6,0)
@@ -181,7 +186,7 @@ end
 
 function sc.updateSlew(v,t)
   softcut.level_slew_time(v,t)
-  softcut.pan_slew_time(v,t)
+  softcut.pan_slew_time(v,t*2)
 end
 
 function sc.mutator2(v,t,r,l,p)
@@ -214,7 +219,7 @@ function checkPos(i,pos)
     params:set("lEnd",lEnd)
     sc.sft_loop_length(1,lStrt,lEnd)
     sc.sft_loop_length(2,lStrt,lEnd)
-    print(lEnd)
+    print(lEnd, pos)
   end
   
 end

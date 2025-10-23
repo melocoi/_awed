@@ -10,25 +10,34 @@ Engine_Sawed : CroneEngine {
 		// ** add your SynthDefs here **
 		SynthDef("Sawed", {
 
-			arg atk, sus, rel, c1, c2, freq, fMult, detune, pan, driftSpeed, driftSpread,driftStart, wrap, cfmin, cfmax, rqmin, rqmax,lsf, ldb, amp, out = 0;
+			arg atk, sus, rel, c1, c2, freq, fMult, detune,
+			pan, driftSpeed, driftSpread, driftStart, wrap,
+			cfmin, cfmax, rqmin, rqmax, deviate, c3,
+			lf, lAmp, amp, out = 0;
 
-			var sig, env;
+			var sig, env, totalEnv, reeq, dev;
 
-      pan = Select.kr(wrap,[
-      	SinOsc.kr(driftSpeed,0,driftSpread,driftStart),
-      	SinOsc.kr(driftSpeed,0,driftSpread,driftStart+1).mod(2)-1
-      ]);
-      
+			pan = Select.kr(wrap,[
+				SinOsc.kr(driftSpeed,0,driftSpread,driftStart),
+				SinOsc.kr(driftSpeed,0,driftSpread,driftStart+1).mod(2)-1
+			]);
+
+			totalEnv = atk+rel+sus;
+			reeq = rrand(rqmin,rqmax);
+			dev = EnvGen.kr(Env([reeq,reeq*deviate],[totalEnv],c3));
 			env = EnvGen.kr(Env([0,1,1,0], [atk,sus,rel], [c1,0, c2]), doneAction:2);
 
 			sig = Saw.ar((freq) *{LFNoise1.kr(0.25,detune).midiratio}!2);
 
-			sig = BPF.ar(
+			sig = Resonz.ar(
 				sig,
 				{LFNoise1.kr(0.75).exprange(cfmin,cfmax)}!2,
-				{LFNoise1.kr(0.1).exprange(rqmin,rqmax)}!2);
+				{dev}!2);
 
-			sig = BLowShelf.ar(sig, lsf, 0.5, ldb);
+
+			sig = BLowShelf.ar(sig, lf, 0.5, lAmp);
+
+			sig = LPF.ar(sig,cfmin*8);
 
 			sig = Balance2.ar(sig[0], sig[1], pan);
 
@@ -46,8 +55,8 @@ Engine_Sawed : CroneEngine {
 			\atk, 5,
 			\sus, 0,
 			\rel, 8,
-			\c1, 1,
-			\c2, (-1),
+			\c1, 3,
+			\c2, (-3),
 			\freq, 200,
 			\fMult, 1,
 			\detune, 0.02,
@@ -60,8 +69,10 @@ Engine_Sawed : CroneEngine {
 			\cfmax, 101,
 			\rqmin,0.005,
 			\rqmax, 0.009,
+			\c3, 3,
+			\deviate, 100,
 			\lsf, 40,
-			\ldb, 0,
+			\ldb, 6,
 			\amp, 1,
 		]);
 

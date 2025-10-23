@@ -16,25 +16,8 @@
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
 --///////////////////////////////////////////////////////////////////////////////////////////////////////////
--- to change your flavor of Just Intonation
--- Comment and Uncomment the lines to select which JI intervals you want.
--- Or make your own!!!
--------------------------------------------------------------------------------------------------------------
---justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8, 2/1 } -- "normal"
-justI = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8, 2/1 } --"Ptolemy"
---justI = { 1/1, 17/16, 9/8, 19/16, 5/4, 21/16, 11/8, 3/2, 13/8, 27/16, 7/4, 15/8, 2/1 } --"overtone"
---justI = { 1/1, 16/15, 8/7, 32/27, 16/13, 4/3, 16/11, 32/21, 8/5, 32/19, 16/9, 32/17 2/1} -- "undertone"
 
--- the following aren't just intonation, but derive from some calculations based on the Tocante synths by Peter Blasser
---justI = { 1/1, 267/250, 333.333/250, 365.85/250, 384.61/250, 500/250, 535.71/250, 555.55/250, 731.70/250, 769.23/250, 833.33/250, 1071.42/250, 1111.11/250 } -- red
---justI = {1/1, 220.58/200, 272.72/200, 300/200, 319.14/200, 400/200, 441.17/200, 454.54/200, 600/200, 638.29/200, 681.81/200, 882.35/200, 909.09/200} -- green
-
---///////////////////////////////////////////////////////////////////////////////////////////////////////////
---///////////////////////////////////////////////////////////////////////////////////////////////////////////
---///////////////////////////////////////////////////////////////////////////////////////////////////////////
---///////////////////////////////////////////////////////////////////////////////////////////////////////////
---///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  
 engine.name = 'Sawed'
 
 -- extras
@@ -42,13 +25,39 @@ s = require 'sequins'
 MusicUtil = require("musicutil")
 
 sft = include('lib/SoftSeas')
-
+parms = include('lib/arams')
 
 
 -- load scales from MusicUtil
 scale_names = {}
 for i = 1, #MusicUtil.SCALES do
   table.insert(scale_names, MusicUtil.SCALES[i].name)
+end
+
+-- load just Intonation table
+
+
+
+justTab = {
+  { name = "normal", 
+    intervals = { 1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 16/9, 15/8, 2/1 }},
+  { name = "Ptolemy",
+    intervals = {1/1, 16/15, 9/8, 6/5, 5/4, 4/3, 45/32, 3/2, 8/5, 5/3, 9/5, 15/8, 2/1 }},
+  { name = "overtones",
+    intervals = {1/1, 17/16, 9/8, 19/16, 5/4, 21/16, 11/8, 3/2, 13/8, 27/16, 7/4, 15/8, 2/1 }},
+  { name = "undertones",
+    intervals = { 1/1, 16/15, 8/7, 32/27, 16/13, 4/3, 16/11, 32/21, 8/5, 32/19, 16/9, 32/17, 2/1 }},
+  { name = "tocantish Red",
+    intervals = {1/1, 267/250, 333.333/250, 365.85/250, 384.61/250, 500/250, 535.71/250, 555.55/250, 731.70/250, 769.23/250, 833.33/250, 1071.42/250, 1111.11/250 }},
+  { name = "tocantish Green",
+    intervals = {1/1, 220.58/200, 272.72/200, 300/200, 319.14/200, 400/200, 441.17/200, 454.54/200, 600/200, 638.29/200, 681.81/200, 882.35/200, 909.09/200}}
+}
+
+justI = justTab[1].intervals
+
+just_names = {}
+for i = 1, #justTab do
+  table.insert(just_names, justTab[i].name)
 end
 
 -- engine setup
@@ -83,8 +92,8 @@ else
   columns = g and g.device.cols
 end
 
- XoffSet = 0
-  gPage = 1 -- default start page if < 16 columns (page 0 and page 1)
+XoffSet = 0
+gPage = 1 -- default start page if < 16 columns (page 0 and page 1)
 --adding softcut stuff
 vol = 1
 rec = 1.0
@@ -101,6 +110,7 @@ newLow = 1245
 dAmp = 1 -- discombobulator volume
 dbTime = 2
 tapeWobble = 1
+wobRate = 12
 
 -- for Engine
 rq = 0.01
@@ -110,7 +120,7 @@ dTune = 1
 driftSpeed = 0.125
 driftSpread = 0.3
 driftStart = 0
-
+deviate = 1
 --for screen
 scX = 0
 scY = 0
@@ -146,7 +156,7 @@ m1.event = function()
     local newNote = table.randFrom(tM1)
    
      if newNote ~= nil then
-        MnewRate = justI[notes_nums[newNote]]/4*math.random(2)
+        MnewRate = justI[notes_nums[newNote]]/(4*math.random(2))
       else
         MnewRate = 0
       end
@@ -162,7 +172,7 @@ m1.event = function()
       local newDur = lEnd - math.random(newStart,lEnd)
       softcut.loop_start(3,newStart)
       softcut.loop_end(3,newStart+newDur)
-      print(newStart, newStart+newDur)
+      --print(newStart, newStart+newDur)
     else
       softcut.loop_start(3,1)
       softcut.loop_end(3,lEnd)
@@ -214,13 +224,11 @@ m2.event = function()
     local newNote = table.randFrom(tM2)
    
       if newNote ~= nil then
-        -- it was -40
-        MnewRate2 = justI[notes_nums[newNote]]/2*(math.random(2)*2) 
+        MnewRate2 = justI[notes_nums[newNote]]/(2*(math.random(2)*2))
       else
         MnewRate2 = 0
       end
       
-   -- MnewRate2 = MusicUtil.interval_to_ratio(notes_nums[newNote]-40)/2*(math.random(2)*2)
     num2 = math.random() >= revChnc2 and 1 or -1
     pan2 = (math.random(70,100)/100) * num2
     MnewRate2 = MnewRate2 * num2
@@ -233,7 +241,7 @@ m2.event = function()
       local newDur = lEnd - math.random(newStart,lEnd)
       softcut.loop_start(4,newStart)
       softcut.loop_end(4,newStart+newDur)
-      print(newStart, newStart+newDur)
+      --print(newStart, newStart+newDur)
     else
       softcut.loop_start(4,1)
       softcut.loop_end(4,lEnd)
@@ -298,321 +306,8 @@ function init()
   
   --adding softcut stuff
   sft.init()
-
-  
-  -- params setup
-  
-  params:add_separator("awed","_awed parameters")
-  
-  params:add_group("Synth Engine",4)
-  params:add{
-    type = "number",
-    id = "dTune",
-    name = "detuning amount",
-    min = 1,
-    max = 400,
-    default = 100,
-    formatter = function(param)
-      return (param:get().." %") end,
-    action = function() dTune = params:get("dTune")/100 end
-  }
-  
-  params:add{
-    type = "number",
-    id = "driftSpeed",
-    name = "Drift Speed",
-    min = 1,
-    max = 4000,
-    default = 12.5,
-    formatter = function(param)
-      local dSpeed = params:get("driftSpeed")/100
-      return (dSpeed.."Hz") end,
-    action = function() 
-      driftSpeed = params:get("driftSpeed")/100
-      engine.driftSpeed(driftSpeed)
-      end
-  }
-  
-  params:add{
-    type = "number",
-    id = "driftSpread",
-    name = "Drift Spread",
-    min = 1,
-    max = 100,
-    default = 40,
-    formatter = function(param)
-      local dSpread = params:get("driftSpread")/100
-      return (dSpread.." ") end,
-    action = function() 
-      driftSpread = params:get("driftSpread")/100
-      engine.driftSpread(driftSpread)
-      end
-  }
-  
-  params:add{
-    type = "number",
-    id = "wrap",
-    name = "Drift Wrap",
-    min = 0,
-    max = 1,
-    default = 0,
-    formatter = function(param)
-      return (param:get().."") end,
-    action = function() 
-      wrap = params:get("wrap")
-      engine.wrap(wrap)
-      end
-  }
-  
-  
-  -- scale and tuning params
-  params:add_group("Tuning",17)
-  
-  params:add_text("text1", "first...", "")
-  params:add_text("text2", "choose a root FREQ", "")
-  params:add_text("text3", "or use a note number", "")
-   params:add_text("blank1", "", "")
-   -- setting root notes using params
-  params:add{
-    type = "number",
-    id = "rootFreq",
-    name = "Root Frequency",
-    min = 1,
-    max = 110,
-    default = 60,
-    formatter = function(param) 
-      
-      return (param:get().." Hz") 
-      end,
-    action = function() build_Root(params:get("rootFreq")) end
-  } 
-  
-   
-  params:add{type = "number", id = "root_note", name = "Root Note",
-    min =1, max = 45, default = 36, formatter = function(param) return MusicUtil.note_num_to_name(param:get(), true) end,
-    action = function()
-      local value = MusicUtil.note_num_to_freq(params:get("root_note"))
-      build_Root(value) 
-      value = value * 100
-      value = math.floor(value)
-      value = value / 100
-     
-      params:set("rootFreq",value)
-      end
-    
-  } -- by employing build_scale() here, we update the scale
-   params:add_text("text4", "param is set when adjusted", "")
-  params:add_text("blank2", "", "")
-  params:add_text("text5", "now choose", "")
-  params:add_text("text6", "your temperament & scale", "")
-  params:add_text("blank3", "", "")
- -- setting temperment type using params
-  params:add{type = "option", id = "temperament", name = "temperament",
-    options = temperament, default = 1,
-    action = function() 
-      
-              if params:get("temperament") == "JI" then
-                JI = true
-                print("Just Intonation")
-              else
-                JI = false
-                print("Unjust Intonation")
-              end
-      
-             end
-    
-  } -- by employing build_scale() here, we update the scale
-  
-  -- setting scale type using params
-  params:add{type = "option", id = "scale", name = "scale",
-    options = scale_names, default = 1,
-    action = function() build_scale() end} -- by employing build_scale() here, we update the scale
-   params:add_text("blank4", "", "")
-    params:add_text("text7", "you can define your", "")
-    params:add_text("text8", "own Just Intonation", "")
-    params:add_text("text9", "in Maiden", "")
-
-  
- -- params:add_separator("loop_settings", "loop settings")
-  
-  params:add_group("Loop Settings",7)
-  scVoice = controlspec.AMP
-  params:add_control("SC Amp","Main Loop Amp",scVoice)
-  params:set("SC Amp",1)
-  params:set_action("SC Amp", function() for i = 1, 2 do softcut.level(i,params:get("SC Amp")) end end)
-  
-  params:add{
-    type = "number",
-    id = "tapeLength",
-    name = "Tape Length",
-    min = 1,
-    max = 160,
-    default = 22,
-    formatter = function(param) return (param:get().." sec") end,
-    action = function() setLoop() end
-  }
-  
-  params:add{
-    type = "number",
-    id = "lEnd",
-    name = "loop duration",
-    min = 1,
-    max = 160,
-    default = 22,
-    formatter = function(param) return (param:get().." sec") end,
-    action = function() setLoop() end
-  }
-  
-  params:add{
-    type = "number",
-    id = "lStrt",
-    name = "loop start",
-    min = 1,
-    max = 160,
-    default = 1,
-    formatter = function(param) return (param:get().." sec") end,
-    action = function() setLoop() end
-  }
-  
-   params:add{
-    type = "number",
-    id = "rateSlew",
-    name = "rate slew",
-    min = 0,
-    max = 43,
-    default = 12,
-    formatter = function(param) return (param:get().." sec") end,
-    action = function() setSlew() end
-  }
-  
-  params:add{
-    type = "number",
-    id = "tapeWobble",
-    name = "Tape Wobble",
-    min = 0,
-    max = 200,
-    default = 100,
-    formatter = function(param) return (param:get().." %") end,
-    action = function() tapeWobble = params:get("tapeWobble")/100 end
-  }
-  
-  scEngIn = controlspec.AMP
-  params:add_control("Eng Amp","Synth Input Amp",scEngIn)
-  params:set("Eng Amp",1)
-  params:set_action("Eng Amp", function() audio.level_eng_cut(params:get("Eng Amp")) end)
-  
-  
-
--- adding mutator control params
-
-  
-  params:add_group("Mutator Settings",8)
-  params:add{
-    type = "number",
-    id = "mutLvl1",
-    name = "mut 1 level",
-    min = 1,
-    max = 100,
-    default = 100,
-    formatter = function(param) return ((param:get())/100) end,
-    action = function() setMutateLevel() end
-  }
-  
-  params:add{
-    type = "number",
-    id = "mutLvl2",
-    name = "mut 2 level",
-    min = 1,
-    max = 100,
-    default = 50,
-    formatter = function(param) return ((param:get())/100) end,
-    action = function() setMutateLevel() end
-  }
-  
-  params:add{
-    type = "number",
-    id = "rstChnc1",
-    name = "mut 1 rest %",
-    min = 1,
-    max = 100,
-    default = 50,
-    formatter = function(param) return (param:get().." %") end,
-    action = function() setRstChnc() end
-  }
-  
-   params:add{
-    type = "number",
-    id = "rstChnc2",
-    name = "mut 2 rest %",
-    min = 1,
-    max = 100,
-    default = 50,
-    formatter = function(param) return (param:get().." %") end,
-    action = function() setRstChnc() end
-  }
-  
-   params:add{
-    type = "number",
-    id = "revChnc1",
-    name = "mut 1 reverse %",
-    min = 1,
-    max = 100,
-    default = 50,
-    formatter = function(param) return (param:get().." %") end,
-    action = function() setRevChnc() end
-  }
-  
-   params:add{
-    type = "number",
-    id = "revChnc2",
-    name = "mut 2 reverse %",
-    min = 1,
-    max = 100,
-    default = 50,
-    formatter = function(param) return (param:get().." %") end,
-    action = function() setRevChnc() end
-  }
-  
-   params:add{
-    type = "number",
-    id = "micChnc1",
-    name = "mut 1 micro %",
-    min = 1,
-    max = 100,
-    default = 10,
-    formatter = function(param) return (param:get().." %") end,
-    action = function() setMicChnc() end
-  }
-  
-   params:add{
-    type = "number",
-    id = "micChnc2",
-    name = "mut 2 micro %",
-    min = 1,
-    max = 100,
-    default = 10,
-    formatter = function(param) return (param:get().." %") end,
-    action = function() setMicChnc() end
-  }
-
--- adding discombobulator control params
-
-
-  params:add_group("Discombobulator",2)
-  
-  PdAmp = controlspec.AMP
-  params:add_control("amplitude","amplitude",PdAmp)
-  params:set("amplitude",1)
-  
-  PdbTime = controlspec.RATE
-  params:add_control("time","time",PdbTime)
-  params:set("time",2)
-  
--- adding inputs to softcut volume controls
-
-
-  
-
+  --adding params
+  parms.init()
   
   --build_scale() -- builds initial scale
   build_Root(params:get("rootFreq"))
@@ -682,19 +377,16 @@ function setSlew()
 end
 
 function build_Root(R)
-  
- 
-    rootFreq = R
-    print("ROOT!!!!")
-  
+  rootFreq = R
+  print("ROOT!!!!")
   build_scale()
 end
 
 function build_scale()
   
-  
-  
-  notes_nums = MusicUtil.generate_scale_of_length(1, params:get("scale"), 9) -- builds scale
+  justI = justTab[params:get("ratios")].intervals
+  print(justTab[params:get("ratios")].name)
+  notes_nums = MusicUtil.generate_scale_of_length(1, params:get("scale"), 32) -- builds scale
   
   notes_freq = {}
   
@@ -713,7 +405,7 @@ function build_scale()
   r = root[ry]
   
   notes = MusicUtil.generate_scale_of_length(MusicUtil.freq_to_note_num(r), params:get("scale"), 28)
-  
+  drones = notes_freq
   filtMax = MusicUtil.note_num_to_freq(notes[#notes])
   low=filtMax
 end
@@ -843,8 +535,23 @@ function keyboardAwed(x,y,z)
         sft.rteOffset(y)
       end
      end
+ end
+
+  if x == 12  and y == 8 then
+    if z == 1 then
+      
+      sT = util.time()
+    elseif z==0 then
+      eT = util.time()
+      teT = eT-sT
+      if teT > 1 then
+         bLong = false
+        bDrone = true
+        g:led(x- XoffSet,y,15)
+        print(bDrone)
+      end
+    end
   end
-  
 
 end
 
@@ -935,10 +642,18 @@ function playSawed(x,y)
     
  -- call note
   nRand = table.randFrom(tT)
+  if nRand == nil then
+    nRand = 1
+  end
+  
   n = r*nRand
   if n>1200 then
     n= n/math.random(1,4)
   end
+  
+  atk = x+y
+  rel = x*y
+  sus = x/2
   
   if bLong then
     freq = n
@@ -946,6 +661,16 @@ function playSawed(x,y)
     rqmax = 5 * rq -- was 30
     detuned = 0.2 * dTune
     amp = ((1 - (nRand/32))/2 + 0.1)*0.5
+  elseif bDrone then
+    freq = r * y
+    atk = x+x
+    rel = x*x
+    sus = x/2
+    rqmin = 1 * rq
+    rqmax = 5 * rq
+    n = drones[nRand]
+    
+    amp = 0.7 --((1 - (nRand/32))/2 + 0.1)*0.5
   else
     freq = mults[y]*(x*x)
     rqmin = 0.7 * rq
@@ -953,21 +678,25 @@ function playSawed(x,y)
     detuned = 1 * dTune
     amp = util.clamp((ampFac/rq)/10,0.4,2)
   end
+  rqmin = util.clamp(rqmin,0.01,5)
+  rqmax = util.clamp(rqmax,0.01,5)
   
+  local newSpeed = math.random()*((driftSpeed *1.25) - driftSpeed) + driftSpeed
   --set up synth and sound
-  engine.atk(x+y)
-  engine.rel(x*y)
-  engine.sus(x/2)
+  engine.atk(atk)
+  engine.rel(rel)
+  engine.sus(sus)
   engine.rqmin(rqmin)
   engine.rqmax(rqmax)
   engine.freq(freq)
   engine.cfmin(n)
   engine.cfmax(n*1.001)
   engine.driftStart(p)
+  engine.driftSpeed(newSpeed)
   engine.detune(detuned)
   engine.amp(amp)
   engine.hz(1)
-  
+  --print(n)
 end
 
 
@@ -985,9 +714,11 @@ function loadLED(x,y,z)
               iz = iz + 1
               
               if ix == x and iy == y then
-               
-                izz[iz] = math.floor((x*y)+x+y+(x/2))
-                
+                if bDrone then
+                  izz[iz] = math.floor((x*x)+x+x+(x/2))
+                else
+                  izz[iz] = math.floor((x*y)+x+y+(x/2))
+                end
                 g:led(ix,iy,izz[iz])
     
               elseif izz[iz] > 1 and z ~= 1 then
@@ -1019,13 +750,18 @@ function loadLED(x,y,z)
 
 -- flip long tones
   if x == 12 and y == 8 then
+    
     if bLong then
       bLong = false
+      bDrone = false
       g:led(x- XoffSet,y,1)
     else
       bLong = true
+      bDrone = false
       g:led(x- XoffSet,y,8)
     end
+    print(bDrone)
+    
   end 
   
 -- set discomb
@@ -1179,7 +915,7 @@ end
 -- clock for tape head wobble
 function rteWobb()
   while true do 
-    clock.sync(12)
+    clock.sync(math.random(1,wobRate))
     softcut.rate(1,calcRteWobble())
     softcut.rate(2,calcRteWobble())
     softcut.rate(5,calcRteWobble())
@@ -1206,9 +942,14 @@ end
 
 -- calculate tape head wobble rate
 function calcRteWobble()
-  rteWobble = (math.random(980,1000)/1000) * newRate + rteOff
-  rteWobble = rteWobble * tapeWobble
-  --print(rteWobble)
+  -- TODO
+  -- create linlin that goes from no tape wobble to 200% tape wobble
+  local noWob = newRate+rteOff
+  local Wobble = (math.random(940,1000)/1000) 
+  Wobble = util.linlin(0,2,1,Wobble,tapeWobble)
+  rteWobble = Wobble * newRate + rteOff
+  --rteWobble = rteWobble * tapeWobble
+  --print(Wobble)
   return rteWobble
 end
 
@@ -1333,7 +1074,7 @@ function key(n,z)
   elseif n==1 and z==1 then
     
     z1 = true
-    
+    print("z1",z1)
   end
   
   -- draw REC level
