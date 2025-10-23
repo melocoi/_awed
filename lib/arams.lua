@@ -8,7 +8,7 @@ function ar.init()
   
   params:add_separator("awed","_awed parameters")
   
-  params:add_group("Synth Engine",5)
+  params:add_group("Sawed Engine",5)
   params:add{
     type = "number",
     id = "dTune",
