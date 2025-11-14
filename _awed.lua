@@ -308,7 +308,7 @@ function init()
   sft.init()
   --adding params
   parms.init()
-  
+  engine.deviate(deviate)
   --build_scale() -- builds initial scale
   build_Root(params:get("rootFreq"))
   m1:start()
