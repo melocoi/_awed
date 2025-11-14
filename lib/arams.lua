@@ -77,7 +77,7 @@ function ar.init()
     name = "Filter Deviation",
     min = 1,
     max = 500,
-    default = 108,
+    default = 205,
     formatter = function(param)
       local dViate = params:get("deviate")/100
       dViate = util.linexp(0.01,5,0.01,500,dViate)
