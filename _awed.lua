@@ -308,7 +308,7 @@ function init()
   sft.init()
   --adding params
   parms.init()
-  engine.deviate(deviate)
+  engine.deviate(deviate) -- should keep the 'feedback' complaint from happening,,,maybe not though. Need to hear an example
   --build_scale() -- builds initial scale
   build_Root(params:get("rootFreq"))
   m1:start()
