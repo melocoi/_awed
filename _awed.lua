@@ -657,8 +657,8 @@ function playSawed(x,y)
   
   if bLong then
     freq = n
-    rqmin = 0.2 * rq
-    rqmax = 0.5 * rq
+    rqmin = 2 * rq
+    rqmax = 5 * rq
     detuned = 0.2 * dTune
     amp = ((1 - (nRand/32))/2 + 0.1)*0.5
   elseif bDrone then
