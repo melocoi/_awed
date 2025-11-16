@@ -215,7 +215,7 @@ rstChnc2 = 0.5
 revChnc2 = 0.5
 micChnc2 = 0.9
 pan2 = -1
-mutLvl2 = 1
+mutLvl2 = 0.5
 
 m2 = metro.init()
 m2.time = 2
