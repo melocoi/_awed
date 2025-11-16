@@ -155,10 +155,11 @@ m1.event = function()
   if mutate then
     m1.time = math.random()+math.random(1,(lEnd-lStrt))
     mPos = math.random()+math.random(1,(lEnd-lStrt))
+    
     local newNote = table.randFrom(tM1)
    
      if newNote ~= nil then
-        MnewRate = justI[notes_nums[newNote]]/(4*math.random(2))
+        MnewRate = justI[notes_nums[newNote]]/4--(4*math.random(2))
       else
         MnewRate = 0
       end
@@ -166,7 +167,7 @@ m1.event = function()
     MnewRate = MnewRate * num * newRate
     pan1 = (math.random(40,80)/100) * num
     sft.updateSlew(3,m1.time*3)
-    sft.mutator(3,m1.time*3,MnewRate,((math.random(90,175)/100)*mutLvl1),pan1)
+    sft.mutator(3,m1.time*3,MnewRate,((math.random(90,175)/100)*mutLvl1*2),pan1)
     softcut.position(3,mPos)
     local rando = math.random()
     if rando > micChnc then
@@ -226,7 +227,7 @@ m2.event = function()
     local newNote = table.randFrom(tM2)
    
       if newNote ~= nil then
-        MnewRate2 = justI[notes_nums[newNote]]/(2*(math.random(2)*2))
+        MnewRate2 = justI[notes_nums[newNote]]*(2*(math.random(2)*2))
       else
         MnewRate2 = 0
       end
@@ -235,7 +236,7 @@ m2.event = function()
     pan2 = (math.random(70,100)/100) * num2
     MnewRate2 = MnewRate2 * num2
     sft.updateSlew(4,m2.time*3)
-    sft.mutator(4,(m2.time*6),MnewRate2,((math.random(60,100)/100)*mutLvl2),pan2)
+    sft.mutator(4,(m2.time*6),MnewRate2,((math.random(60,150)/100)*mutLvl2),pan2)
     softcut.position(4,mPos2)
     local rando = math.random()
     if rando > micChnc2 then
