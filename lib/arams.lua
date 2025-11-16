@@ -113,8 +113,8 @@ function ar.init()
     id = "rootFreq",
     name = "Root Frequency",
     min = 1,
-    max = 240, --49 is safe
-    default = 180,
+    max = 360, 
+    default = 60,
     formatter = function(param) 
       
       return (param:get().." Hz") 
@@ -124,7 +124,7 @@ function ar.init()
   
    
   params:add{type = "number", id = "root_note", name = "Root Note",
-    min =1, max = 31, default = 24, formatter = function(param) return MusicUtil.note_num_to_name(param:get(), true) end,
+    min =1, max = 60, default = 36, formatter = function(param) return MusicUtil.note_num_to_name(param:get(), true) end,
     action = function()
       local value = MusicUtil.note_num_to_freq(params:get("root_note"))
       build_Root(value) 
