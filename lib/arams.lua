@@ -113,8 +113,8 @@ function ar.init()
     id = "rootFreq",
     name = "Root Frequency",
     min = 1,
-    max = 49,
-    default = 30,
+    max = 240, --49 is safe
+    default = 180,
     formatter = function(param) 
       
       return (param:get().." Hz") 

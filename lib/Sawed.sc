@@ -34,11 +34,6 @@ Engine_Sawed : CroneEngine {
 				{LFNoise1.kr(0.75).exprange(cfmin,cfmax)}!2,
 				{dev}!2);
 
-
-			sig = BLowShelf.ar(sig, lf, 0.5, lAmp);
-
-			sig = LPF.ar(sig,cfmin*8);
-
 			sig = Balance2.ar(sig[0], sig[1], pan);
 
 			sig = sig * env * amp;
@@ -71,8 +66,6 @@ Engine_Sawed : CroneEngine {
 			\rqmax, 0.009,
 			\c3, 3,
 			\deviate, 100,
-			\lsf, 40,
-			\ldb, 6,
 			\amp, 1,
 		]);
 

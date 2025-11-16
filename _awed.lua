@@ -310,7 +310,7 @@ function init()
   sft.init()
   --adding params
   parms.init()
-  engine.deviate(deviate) -- should keep the 'feedback' complaint from happening,,,maybe not though. Need to hear an example
+  engine.deviate(deviate)
   --build_scale() -- builds initial scale
   build_Root(params:get("rootFreq"))
   m1:start()
@@ -657,10 +657,12 @@ function playSawed(x,y)
   rel = x*y
   sus = x/2
   
+  --over 3000hz and things explode
+  
   if bLong then
     freq = n
-    rqmin = 2 * rq
-    rqmax = 5 * rq
+    rqmin = 0.8 * rq
+    rqmax = 1 * rq -- was 30
     detuned = 0.2 * dTune
     amp = ((1 - (nRand/32))/2 + 0.1)*0.5
   elseif bDrone then
@@ -668,8 +670,8 @@ function playSawed(x,y)
     atk = x+x
     rel = x*x
     sus = x/2
-    rqmin = 1 * rq
-    rqmax = 5 * rq
+    rqmin = 0.5 * rq
+    rqmax = 1 * rq
     n = drones[nRand]
     
     amp = 0.7 --((1 - (nRand/32))/2 + 0.1)*0.5
@@ -678,7 +680,7 @@ function playSawed(x,y)
     rqmin = 0.7 * rq
     rqmax = 0.9 * rq
     detuned = 1 * dTune
-    amp = util.clamp((ampFac/rq)/10,0.4,2)
+    amp = util.clamp((ampFac/rq)/10,0.4,0.9)
   end
   rqmin = util.clamp(rqmin,0.01,5)
   rqmax = util.clamp(rqmax,0.01,5)
@@ -692,13 +694,15 @@ function playSawed(x,y)
   engine.rqmax(rqmax)
   engine.freq(freq)
   engine.cfmin(n)
-  engine.cfmax(n*1.001)
+  engine.cfmax(n*1.01)
   engine.driftStart(p)
   engine.driftSpeed(newSpeed)
   engine.detune(detuned)
   engine.amp(amp)
   engine.hz(1)
-  --print(n)
+  print(n)
+  print(rqmin)
+  print(rqmax)
 end
 
 
